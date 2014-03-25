@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Simple Map</title>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.8/js/esri/css/esri.css">
+    <style>
+      html, body, #map {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background-color: #FFF;
+        overflow: hidden;
+        font-family: "Trebuchet MS";
+      }
+    </style>
+    <script src="http://js.arcgis.com/3.8/"></script>
+    <script>
+      var map;
+      var btnGetJSON;
+
+      require(["esri/map", "esri/request", "dojo/domReady!"], function(Map,esriRequest) {
+        
+esriConfig.defaults.io.proxyUrl = "proxy/proxy.php"
+        map = new Map("map", {
+          basemap: "topo",
+          center: [-122.45,37.75], // long, lat
+          zoom: 13,
+          sliderStyle: "small"
+        });
+
+        btnGetJSON = document.getElementById("btn-get-json");
+
+        btnGetJSON.onclick = function(evet){
+          GetJSON();
+        }.bind(this)
+
+         function GetJSON(){
+                var extent = map.extent.xmin + "," + map.extent.ymin + "," + map.extent.xmax + "," + map.extent.ymax;
+                var layerUrl = "test.json";
+                var layersRequest = esriRequest({
+                    url: layerUrl,
+                    handleAs: "json",
+                    callbackParamName: "callback"
+                });
+                layersRequest.then(
+                        function(response) {
+                          for (var obj in response)
+                            console.log("my object " + JSON.stringify(obj.location))
+                          
+                            console.log("Success: ", JSON.stringify(response));
+                        }, function(error) {
+                            console.log("Error: ", JSON.stringify(error));
+                        });
+            }
+
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="FF-Test">
+        <button id="btn-get-json">Get JSON</button>
+    </div>  
+    <div id="map"></div>
+  </body>
+</html>
